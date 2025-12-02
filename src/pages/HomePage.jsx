@@ -12,7 +12,7 @@ function HomePage({ onConnectWallet, onVerifyCertificate }) {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  CertiChain
+                  CertiVerse
                 </h1>
                 <p className="text-xs text-gray-500">Certification sur Blockchain</p>
               </div>
@@ -128,10 +128,10 @@ function HomePage({ onConnectWallet, onVerifyCertificate }) {
               <div className="bg-gradient-to-br from-blue-600 to-cyan-600 p-2 rounded-lg">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">CertiChain</span>
+              <span className="text-xl font-bold text-white">CertiVerse</span>
             </div>
             <p className="text-sm text-gray-400">
-              © 2024 CertiChain. Propulsé par Ethereum.
+              © 2025 CertiVerse. Propulsé par Ethereum.
             </p>
           </div>
         </div>

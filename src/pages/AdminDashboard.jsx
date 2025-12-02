@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import {
   LogOut, Search, Building2, Award, TrendingUp, Plus, X, Copy, Check,
-  AlertCircle, CheckCircle, Ban, ExternalLink
+  AlertCircle, CheckCircle, Ban, ExternalLink, Loader2
 } from 'lucide-react';
 
 export default function AdminDashboard({ adminAddress, onDisconnect, contract }) {
@@ -13,13 +13,13 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
     totalCertificates: 0,
     revokedCertificates: 0
   });
-
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [submitStatus, setSubmitStatus] = useState(null); // { type: 'loading' | 'success' | 'error', message, txHash }
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [revokingAddress, setRevokingAddress] = useState(null); // Pour spinner sur le bouton
 
   const [formData, setFormData] = useState({
     address: '',
@@ -28,17 +28,13 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
     type: 'Université',
     registeredAt: Math.floor(Date.now() / 1000)
   });
-
   const [formErrors, setFormErrors] = useState({});
 
   // Charger toutes les données depuis le contrat
   const loadData = async () => {
     if (!contract) return;
-
     try {
       setLoading(true);
-
-      // Stats globales
       const globalStats = await contract.getGlobalStats();
       setStats({
         totalOrgs: Number(globalStats[0]),
@@ -47,7 +43,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
         revokedCertificates: Number(globalStats[3])
       });
 
-      // Liste complète des organisations
       const [
         addresses, names, emails, types, actives,
         totalIssued, totalRevoked, uniqueStudents, registeredAt
@@ -73,12 +68,10 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
   };
 
   useEffect(() => {
-    if (contract) {
-      loadData();
-    }
+    if (contract) loadData();
   }, [contract]);
 
-  // Copier une adresse
+  // Copier adresse
   const copyToClipboard = (text, id) => {
     navigator.clipboard.writeText(text);
     setCopiedAddress(id);
@@ -105,7 +98,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
   // Ajouter une organisation
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const addressError = validateAddress(formData.address);
     if (addressError || !formData.name || !formData.email) {
       setFormErrors({
@@ -118,7 +110,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
 
     try {
       setSubmitStatus({ type: 'loading', message: 'Envoi de la transaction...' });
-
       const tx = await contract.registerOrganization(
         formData.address,
         formData.name,
@@ -126,9 +117,7 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
         formData.type,
         formData.registeredAt
       );
-
       setSubmitStatus({ type: 'loading', message: 'Transaction en attente...', txHash: tx.hash });
-
       await tx.wait();
 
       setSubmitStatus({
@@ -137,17 +126,14 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
         txHash: tx.hash
       });
 
-      // Recharger les données
-      loadData();
+      await loadData(); // Recharge les données
 
-      // Reset formulaire
       setTimeout(() => {
         setShowAddForm(false);
         setFormData({ address: '', name: '', email: '', type: 'Université', registeredAt: Math.floor(Date.now() / 1000) });
         setSubmitStatus(null);
         setFormErrors({});
       }, 3000);
-
     } catch (err) {
       console.error(err);
       setSubmitStatus({
@@ -157,18 +143,41 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
     }
   };
 
-  // Révoquer une organisation
+  // RÉVOCATION INSTANTANÉE (mise à jour optimiste)
   const handleRevoke = async (orgAddress) => {
-    if (!confirm(`Révoquer l'organisation ${orgAddress.slice(0, 8)}... ?`)) return;
+    if (!window.confirm(`Révoquer définitivement l'organisation ${orgAddress.slice(0, 8)}... ?`)) return;
+
+    // Mise à jour optimiste (UI instantanée)
+    setOrganizations(prev =>
+      prev.map(org =>
+        org.address === orgAddress
+          ? { ...org, status: 'révoqué' }
+          : org
+      )
+    );
+    setStats(prev => ({ ...prev, activeOrgs: prev.activeOrgs - 1 }));
+    setRevokingAddress(orgAddress);
 
     try {
       const tx = await contract.revokeOrganization(orgAddress);
-      alert("Transaction envoyée...");
       await tx.wait();
-      alert("Organisation révoquée !");
-      loadData();
+      // Succès → rien à faire, déjà mis à jour localement
     } catch (err) {
-      alert("Erreur : " + (err.reason || err.message));
+      console.error("Échec révocation:", err);
+
+      // Rollback en cas d'erreur
+      setOrganizations(prev =>
+        prev.map(org =>
+          org.address === orgAddress
+            ? { ...org, status: 'actif' }
+            : org
+        )
+      );
+      setStats(prev => ({ ...prev, activeOrgs: prev.activeOrgs + 1 }));
+
+      alert("Échec de la révocation : " + (err.reason || err.message || "Transaction refusée"));
+    } finally {
+      setRevokingAddress(null);
     }
   };
 
@@ -178,7 +187,9 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
     const colors = {
       'Université': 'bg-blue-100 text-blue-700',
       'Formation': 'bg-purple-100 text-purple-700',
+      'Organisme de formation': 'bg-purple-100 text-purple-700',
       'Centre': 'bg-orange-100 text-orange-700',
+      'Centre de certification': 'bg-orange-100 text-orange-700',
       'Entreprise': 'bg-cyan-100 text-cyan-700'
     };
     return colors[type] || 'bg-gray-100 text-gray-700';
@@ -210,12 +221,20 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
               <p className="text-sm text-gray-500 mt-1">Gérez les organisations autorisées à émettre des certificats</p>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2 rounded-lg">
-                <div className="flex items-center space-x-2 text-white">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-mono">{truncateAddress(adminAddress)}</span>
-                </div>
-              </div>
+              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-5 py-3 rounded-lg cursor-pointer hover:from-blue-700 hover:to-cyan-700 transition-all">
+  <button
+    onClick={() => copyToClipboard(adminAddress, 'admin')}
+    className="flex items-center space-x-2 text-white"
+  >
+    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+    <span className="text-sm font-mono">{truncateAddress(adminAddress)}</span>
+    {copiedAddress === 'admin' ? (
+      <Check className="w-4 h-4 text-green-300" />
+    ) : (
+      <Copy className="w-4 h-4 opacity-70 hover:opacity-100" />
+    )}
+  </button>
+</div>
               <button onClick={onDisconnect} className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium">
                 <LogOut className="w-4 h-4" />
                 <span>Déconnexion</span>
@@ -226,7 +245,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
@@ -280,7 +298,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
                 <span>Ajouter une organisation</span>
               </button>
             </div>
-
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
@@ -299,8 +316,8 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
               >
                 <option value="all">Tous les types</option>
                 <option value="Université">Université</option>
-                <option value="Formation">Organisme de formation</option>
-                <option value="Centre">Centre de certification</option>
+                <option value="Organisme de formation">Organisme de formation</option>
+                <option value="Centre de certification">Centre de certification</option>
                 <option value="Entreprise">Entreprise</option>
               </select>
             </div>
@@ -369,9 +386,17 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
                         {org.status === 'actif' && (
                           <button
                             onClick={() => handleRevoke(org.address)}
-                            className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm font-medium"
+                            disabled={revokingAddress === org.address}
+                            className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                           >
-                            Révoquer
+                            {revokingAddress === org.address ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Révocation...</span>
+                              </>
+                            ) : (
+                              'Révoquer'
+                            )}
                           </button>
                         )}
                       </td>
@@ -402,7 +427,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
                 <X className="w-6 h-6 text-gray-500" />
               </button>
             </div>
-
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {submitStatus && (
                 <div className={`p-4 rounded-lg border ${submitStatus.type === 'success' ? 'bg-green-50 border-green-200' : submitStatus.type === 'loading' ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200'}`}>
@@ -428,7 +452,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
                   </div>
                 </div>
               )}
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Adresse Ethereum *</label>
                 <input
@@ -440,17 +463,14 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
                 />
                 {formErrors.address && <p className="mt-1 text-sm text-red-600">{formErrors.address}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Nom *</label>
                 <input type="text" value={formData.name} onChange={(e) => handleInputChange('name', e.target.value)} placeholder="Université de Tunis" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
                 <input type="email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="contact@org.tn" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Type *</label>
                 <select value={formData.type} onChange={(e) => handleInputChange('type', e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
@@ -460,7 +480,6 @@ export default function AdminDashboard({ adminAddress, onDisconnect, contract })
                   <option>Entreprise</option>
                 </select>
               </div>
-
               <div className="flex space-x-4 pt-4">
                 <button type="button" onClick={() => setShowAddForm(false)} className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold">
                   Annuler
