@@ -3,44 +3,74 @@ import { Web3Provider, useWeb3 } from './context/Web3Context';
 import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import OrganizationDashboard from './pages/OrganizationDashboard';
-import VerifyCertificate from './pages/VerifyCertificate';
+import StudentDashboard from './pages/StudentDashboard';
+import EmployerVerification from './pages/EmployerVerification';
+import CertificateVerification from './pages/CertificateVerification';
+import StudentProfileViewer from './pages/StudentProfileViewer';
 import { useEffect, useState } from 'react';
-import { getCertIdFromUrl } from './utils/urlUtils';
 
 function AppContent() {
   const { account, isAdmin, isRegisteredOrg, orgData, loading, connectWallet, disconnect } = useWeb3();
-  const [showVerifyPage, setShowVerifyPage] = useState(false);
-  const [initialCertId, setInitialCertId] = useState(null);
+  const [currentPage, setCurrentPage] = useState('home');
 
   useEffect(() => {
-    // Vérifier si un certificat est demandé via URL (QR code)
-    const certId = getCertIdFromUrl();
-    if (certId) {
-      setInitialCertId(certId);
-      setShowVerifyPage(true);
+    // Check URL for routing
+    const path = window.location.pathname;
+    if (path.includes('/employer')) {
+      setCurrentPage('employer');
+    } else if (path.includes('/verify')) {
+      setCurrentPage('verify');
+    } else if (path.includes('/profile')) {
+      setCurrentPage('profile');
+    } else {
+      setCurrentPage('home');
     }
-    
+
     // Optionnel : auto-connect si déjà connecté
     if (window.ethereum?.selectedAddress) {
       connectWallet();
     }
   }, []);
 
-  // Afficher la page de vérification
-  if (showVerifyPage) {
-    return <VerifyCertificate onBack={() => setShowVerifyPage(false)} initialCertId={initialCertId} />;
-  }
+  // Update URL when page changes
+  const navigate = (page) => {
+    setCurrentPage(page);
+    window.history.pushState({}, '', `/${page === 'home' ? '' : page}`);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
-        <div className="text-2xl font-bold text-blue-600">Connexion à la blockchain...</div>
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--color-primary-500)] border-t-transparent mx-auto mb-4"></div>
+          <p className="text-xl font-semibold gradient-text font-display">Connexion à la blockchain...</p>
+        </div>
       </div>
     );
   }
 
+  // Employer/Verifier routes (accessible without account)
+  if (currentPage === 'employer') {
+    return (
+      <EmployerVerification
+        onNavigateToVerify={() => navigate('verify')}
+        onNavigateToProfile={() => navigate('profile')}
+        onNavigateHome={() => navigate('home')}
+      />
+    );
+  }
+
+  if (currentPage === 'verify') {
+    return <CertificateVerification onBack={() => navigate('employer')} />;
+  }
+
+  if (currentPage === 'profile') {
+    return <StudentProfileViewer onBack={() => navigate('employer')} />;
+  }
+
+  // Regular user flows (require account connection)
   if (!account) {
-    return <HomePage onConnectWallet={connectWallet} onVerifyCertificate={() => setShowVerifyPage(true)} />;
+    return <HomePage onConnectWallet={connectWallet} onNavigateToEmployer={() => navigate('employer')} />;
   }
 
   if (isAdmin) {
@@ -60,18 +90,9 @@ function AppContent() {
     );
   }
 
-  // Compte connecté mais pas autorisé
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
-      <div className="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md">
-        <h2 className="text-2xl font-bold text-red-600 mb-4">Accès refusé</h2>
-        <p className="text-gray-700">Cette adresse n'est ni admin, ni organisation enregistrée.</p>
-        <button onClick={disconnect} className="mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
-          Déconnexion
-        </button>
-      </div>
-    </div>
-  );
+  // Si l'utilisateur n'est ni admin ni organisation, c'est un étudiant
+  // Rediriger vers le StudentDashboard
+  return <StudentDashboard studentAddress={account} onDisconnect={disconnect} contract={useWeb3().contract} />;
 }
 
 function App() {
