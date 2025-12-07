@@ -22,7 +22,7 @@ export const generateCertificateHTML = (certData) => {
     year: 'numeric'
   });
 
-  // Extract just the numeric ID for the QR code (e.g., "CERT-12345" -> "12345")
+  // Extract just the numeric ID for the QR code (e.g., "CERT-2024-1234" -> "1234")
   const numericId = certId.includes('-') ? certId.split('-').pop() : certId;
 
   return `<!DOCTYPE html>
