@@ -319,7 +319,9 @@ function VerifyCertificate({ onBack, initialCertId }) {
                     <p className="text-lg font-semibold text-gray-900">{certificate.studentName}</p>
                     <p className="text-sm text-gray-600">{certificate.studentEmail}</p>
                     <div className="flex items-center space-x-2 group">
-                      <p className="text-xs text-gray-400 font-mono break-all flex-1">{certificate.student}</p>
+                      <p className="text-xs text-gray-400 font-mono flex-1">
+                        {certificate.student.slice(0, 6)}...{certificate.student.slice(-4)}
+                      </p>
                       <button
                         onClick={() => copyToClipboard(certificate.student, 'student')}
                         className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded"
@@ -341,7 +343,9 @@ function VerifyCertificate({ onBack, initialCertId }) {
                     </div>
                     <p className="text-lg font-semibold text-gray-900">{certificate.issuerName}</p>
                     <div className="flex items-center space-x-2 group">
-                      <p className="text-xs text-gray-400 font-mono break-all flex-1">{certificate.issuer}</p>
+                      <p className="text-xs text-gray-400 font-mono flex-1">
+                        {certificate.issuer.slice(0, 6)}...{certificate.issuer.slice(-4)}
+                      </p>
                       <button
                         onClick={() => copyToClipboard(certificate.issuer, 'issuer')}
                         className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded"
