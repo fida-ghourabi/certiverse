@@ -572,7 +572,7 @@ VITE_QR_API_URL=https://api.qrserver.com/v1/create-qr-code
 
 Pour que le frontend puisse interagir avec votre contrat, vous devez mettre à jour l'ABI :
 
-1.  Copiez l'ABI depuis Remix (voir section Déploiement).
+1.  Copiez l'ABI depuis Remix (voir section Compilation).
 2.  Ouvrez `src/utils/ContractABI.json`.
 3.  Remplacez tout le contenu par votre nouvel ABI (gardez le format JSON `[...]`).
 
