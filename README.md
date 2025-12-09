@@ -1,4 +1,4 @@
-# 🎓 CertiVerse - Plateforme Décentralisée de Certification Académique
+# 🎓 CertiVerse - Plateforme Décentralisée de Certification Académique et Professionnelles
 
 <div align="center">
 
@@ -9,9 +9,9 @@
 [![IPFS](https://img.shields.io/badge/IPFS-Pinata-65C2CB?style=flat-square&logo=ipfs&logoColor=white)](https://www.pinata.cloud/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](./LICENSE)
 
-**Une solution Web3 complète pour l'émission, la gestion et la vérification de certificats académiques sur la blockchain Ethereum.**
+**Une solution Web3 complète pour l'émission, la gestion et la vérification de certificats académiques / professionnelles sur la blockchain Ethereum.**
 
-[🌐 Application](https://certiverse-six.vercel.app) • [📄 Documentation](#documentation) • [🛠️ Installation](#installation)
+[🌐 Application](https://certiverse-six.vercel.app) • [🛠️ Installation](#-installation)
 
 </div>
 
@@ -22,25 +22,23 @@
 - [Introduction](#-introduction)
 - [Problématique](#-problématique)
 - [Solution Proposée](#-solution-proposée)
-- [Architecture](#-architecture)
-- [Technologies Utilisées](#-technologies-utilisées)
+- [Flux Principaux du Système](#-flux-principaux-du-système)
+- [Technologies Utilisées](#%EF%B8%8F-technologies-utilisées)
 - [Fonctionnalités](#-fonctionnalités)
-- [Smart Contract](#-smart-contract)
+- [Smart Contract](#-smart-contract---fonctions-principales)
 - [Installation](#-installation)
-- [Configuration](#-configuration)
+- [Configuration](#%EF%B8%8F-configuration)
 - [Utilisation](#-utilisation)
 - [Captures d'Écran](#-captures-décran)
 - [Structure du Projet](#-structure-du-projet)
 - [Sécurité](#-sécurité)
-- [Contribution](#-contribution)
-- [Auteur](#-auteur)
-- [Licence](#-licence)
-
+- [Auteur](#%E2%80%8D-auteur)
+  
 ---
 
 ## 🌟 Introduction
 
-**CertiVerse** est une application décentralisée (DApp) innovante qui révolutionne la gestion des certificats académiques en exploitant la puissance de la technologie blockchain. Cette plateforme permet aux institutions éducatives d'émettre des certificats numériques infalsifiables, aux étudiants de gérer leur portfolio de certifications, et aux employeurs de vérifier instantanément l'authenticité des diplômes.
+**CertiVerse** est une application décentralisée (DApp) innovante qui révolutionne la gestion des certificats académiques et professionnelles en exploitant la puissance de la technologie blockchain. Cette plateforme permet aux organisations (Institutions éducatives, Université, Centre de Formation, Entreprise) d'émettre des certificats numériques infalsifiables, aux étudiants de gérer leur portfolio de certifications, et aux employeurs de vérifier instantanément l'authenticité des diplômes.
 
 ### Objectifs du Projet
 
@@ -70,20 +68,28 @@ Le système traditionnel de gestion des diplômes et certificats souffre de plus
 CertiVerse répond à ces défis en proposant une architecture décentralisée basée sur :
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    🌐 BLOCKCHAIN ETHEREUM                       │
-├─────────────────────────────────────────────────────────────────┤
-│  📜 Smart Contract CertiVerse                                   │
-│  ├── Gestion des organisations autorisées                      │
-│  ├── Émission/Révocation de certificats                        │
-│  └── Traçabilité complète des opérations                       │
-├─────────────────────────────────────────────────────────────────┤
-│  📦 IPFS (via Pinata)                                           │
-│  └── Stockage décentralisé des certificats PDF                 │
-├─────────────────────────────────────────────────────────────────┤
-│  💻 Frontend React                                              │
-│  └── Interface utilisateur moderne et responsive               │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────
+│                    🌐 BLOCKCHAIN ETHEREUM                       
+├─────────────────────────────────────────────────────────────────
+│  📜 Smart Contract CertiVerse                                   
+│  ├── Gestion des organisations autorisées                     
+│  ├── Émission/Révocation de certificats                        
+│  ├── Traçabilité complète des opérations
+│  ├── Déployé sur Ethereum Sepolia (testnet réel)
+│  ├── Transactions visibles sur Etherscan
+│  └── Falsification impossible                 
+├─────────────────────────────────────────────────────────────────
+│  📦 IPFS (via Pinata)                                           
+│  ├── Stockage décentralisé et permanent des certificats
+│  └── Vérification publique instantanée
+│        ~ Accessible sans compte (/verify/ID)         
+├─────────────────────────────────────────────────────────────────
+│  💻 Frontend React
+│  ├── Changement de compte MetaMask détecté instantanément                     
+│  ├── Partage automatique des certifications sur LinkedIn
+│  ├── Export des certifications en PDF                                            
+│  └── Interface utilisateur moderne et responsive               
+└─────────────────────────────────────────────────────────────────
 ```
 
 ### Avantages Clés
@@ -96,69 +102,76 @@ CertiVerse répond à ces défis en proposant une architecture décentralisée b
 
 ---
 
-## 🏗️ Architecture
+## 🔄 Flux Principaux du Système
 
-### Architecture Globale
-
-```mermaid
-graph TB
-    subgraph Frontend["💻 Frontend React"]
-        HP[Page d'Accueil]
-        AD[Dashboard Admin]
-        OD[Dashboard Organisation]
-        SD[Dashboard Étudiant]
-        EV[Vérification Employeur]
-        CV[Vérification Certificat]
-    end
-
-    subgraph Blockchain["⛓️ Blockchain Sepolia"]
-        SC[Smart Contract<br/>CertiVerse]
-    end
-
-    subgraph Storage["📦 Stockage"]
-        IPFS[IPFS via Pinata]
-    end
-
-    subgraph Wallet["🦊 Wallet"]
-        MM[MetaMask]
-    end
-
-    HP --> MM
-    MM <--> SC
-    AD <--> SC
-    OD <--> SC
-    OD --> IPFS
-    SD <--> SC
-    EV --> CV
-    CV <--> SC
-```
-
-### Flux Utilisateur
+### Flux 1 : Enregistrement d'une Organisation
 
 ```mermaid
 sequenceDiagram
-    participant A as Admin
-    participant O as Organisation
-    participant S as Étudiant
-    participant E as Employeur
-    participant BC as Blockchain
-    participant IPFS as IPFS
-
-    A->>BC: Enregistre l'organisation
-    BC-->>A: Confirmation TX
-
-    O->>IPFS: Upload certificat PDF
-    IPFS-->>O: Hash IPFS
-    O->>BC: Émet le certificat
-    BC-->>O: ID Certificat
-
-    S->>BC: Consulte ses certificats
-    BC-->>S: Liste des certificats
-
-    E->>BC: Vérifie certificat (ID)
-    BC-->>E: Détails + Statut
+    participant Admin
+    participant MetaMask
+    participant SmartContract as Smart Contract
+    participant Blockchain
+    
+    Admin->>MetaMask: Initie l'enregistrement
+    Admin->>MetaMask: Remplit formulaire (adresse, nom, email, type)
+    MetaMask->>Admin: Demande confirmation transaction
+    Admin->>MetaMask: Confirme et signe
+    MetaMask->>SmartContract: registerOrganization()
+    SmartContract->>Blockchain: Enregistre Organization struct
+    Blockchain-->>SmartContract: Transaction confirmée
+    SmartContract-->>MetaMask: Event OrganizationRegistered
+    MetaMask-->>Admin: Notification succès + lien Etherscan
 ```
 
+### Flux 2 : Émission d'un Certificat
+
+```mermaid
+sequenceDiagram
+    participant Org as Organisation
+    participant Frontend
+    participant IPFS as IPFS/Pinata
+    participant MetaMask
+    participant SmartContract as Smart Contract
+    participant Student as Étudiant
+    
+    Org->>Frontend: Remplit formulaire certificat
+    Frontend->>Frontend: Génère certificat avec QR code
+    Frontend->>IPFS: Upload certificat
+    IPFS-->>Frontend: Retourne Hash IPFS
+    Frontend->>MetaMask: Prépare transaction
+    MetaMask->>Org: Demande confirmation
+    Org->>MetaMask: Confirme
+    MetaMask->>SmartContract: issueCertificate(student, data, ipfsHash)
+    SmartContract->>SmartContract: Incrémente certificateCounter
+    SmartContract->>SmartContract: Stocke Certificate struct
+    SmartContract->>SmartContract: Ajoute à studentCertificates[student]
+    SmartContract-->>MetaMask: Event CertificateIssued
+    MetaMask-->>Frontend: Transaction confirmée
+    Frontend-->>Org: Notification succès
+    Note over Student: Le certificat apparaît<br/>automatiquement dans<br/>son dashboard
+```
+
+### Flux 3 : Vérification par un Employeur
+
+```mermaid
+sequenceDiagram
+    participant Emp as Employeur
+    participant Frontend
+    participant Provider as RPC Provider
+    participant SmartContract as Smart Contract
+    participant IPFS
+    
+    Emp->>Frontend: Accède /verify/:certId ou scan QR
+    Frontend->>Provider: Connexion lecture seule (pas de wallet)
+    Provider->>SmartContract: getCertificate(certId)
+    SmartContract-->>Provider: Certificate struct
+    Provider-->>Frontend: Données du certificat
+    Frontend->>IPFS: Récupère certificat via ipfsHash
+    IPFS-->>Frontend: Fichier HTML
+    Frontend-->>Emp: Affiche détails + statut + certificat
+    Note over Emp: Vérification instantanée<br/>Statut: Valide/Révoqué<br/>Toutes les informations
+```
 ---
 
 ## 🛠️ Technologies Utilisées
@@ -200,33 +213,62 @@ sequenceDiagram
 ### 👤 Rôles Utilisateurs
 
 #### 1. Administrateur
+**Rôle** : Garant de l'écosystème, gère les droits d'émission
 - ➕ Enregistrer de nouvelles organisations
 - 🚫 Révoquer les organisations non conformes
 - 📊 Visualiser les statistiques globales
 - 🔍 Rechercher et filtrer les organisations
 
+**Actions** :
+- `registerOrganization()` - Ajouter une institution
+- `revokeOrganization()` - Retirer les droits d'une institution
+- Consultation du dashboard avec métriques globales
+
 #### 2. Organisation (Université, Centre de Formation, Entreprise)
+**Rôle** : Émetteur de certificats pour ses étudiants/collaborateurs
 - 📝 Émettre des certificats individuels ou en lot (batch)
 - 📊 Analytics et statistiques détaillées
 - 🔄 Révoquer des certificats si nécessaire
 - 📋 Gérer la liste des certificats émis
 - 🔍 Filtrer par type, statut, étudiant
-- 💾 Génération automatique de PDF avec QR code
+- 💾 Génération automatique de certificat avec QR code
+
+**Actions** :
+- `issueCertificate()` - Emission individuelle
+- Batch issuance - Emission en lot (frontend)
+- `revokeCertificate()` - Révocation
+- Upload certificat sur IPFS via Pinata
+- Filtrage et recherche dans ses certificats
 
 #### 3. Étudiant
+**Rôle** : Bénéficiaire et propriétaire de ses certificats
 - 📜 Consulter tous ses certificats
 - ⬇️ Télécharger les certificats en PDF
 - 🔗 Partager sur LinkedIn
 - 📋 Copier le lien de vérification
 - 📊 Historique des transactions blockchain
 
+**Actions** :
+- Connexion via wallet MetaMask
+- Visualisation automatique de tous ses certificats
+- Téléchargement PDF
+- Copie du lien de vérification
+- Partage sur LinkedIn
+
 #### 4. Employeur / Vérificateur
+**Rôle** : Tiers de confiance vérifiant l'authenticité des diplômes
 - ✅ Vérifier l'authenticité d'un certificat par ID
 - 👤 Consulter le profil complet d'un étudiant
 - 🔍 Accès sans connexion wallet requise
 
+**Actions** :
+- Vérification par ID de certificat
+- Consultation du profil étudiant par adresse wallet
+- Accès public à `/employer` et `/verify/:id`
+- Scan de QR code pour vérification instantanée
+
 ### 🎨 Caractéristiques UI/UX
-- 🌙 Design moderne avec thème sombre
+- 🌙 Design moderne
 - ✨ Animations fluides (Framer Motion)
 - 📱 Responsive design (desktop & mobile)
 - 🔔 Notifications toast élégantes
@@ -234,7 +276,7 @@ sequenceDiagram
 
 ---
 
-## 📜 Smart Contract
+## 📜 Smart Contract - Fonctions Principales
 
 ### Adresse du Contrat (Sepolia)
 ```
@@ -244,55 +286,199 @@ sequenceDiagram
 > [!NOTE]
 > Ce contrat est déployé sur le réseau Sepolia et est utilisé en production.
 
-### Structures de Données
+### Variables d'État
 
 ```solidity
-struct Organization {
-    string name;          // Nom de l'organisation
-    string email;         // Email de contact
-    string orgType;       // Type: "university", "training", "enterprise"
-    bool isActive;        // Statut actif/révoqué
-    uint256 registeredAt; // Date d'enregistrement
-    uint256 totalIssued;  // Nombre de certificats émis
-    uint256 totalRevoked; // Nombre révoqués
-    uint256 uniqueStudents; // Étudiants uniques
-}
+// Adresse de l'administrateur (définie au déploiement, immutable)
+address public immutable admin;
 
-struct Certificate {
-    uint256 id;           // Identifiant unique
-    address issuer;       // Adresse de l'émetteur
-    string issuerName;    // Nom de l'émetteur
-    address student;      // Adresse de l'étudiant
-    string studentName;   // Nom de l'étudiant
-    string studentEmail;  // Email de l'étudiant
-    string formationName; // Nom de la formation
-    string certType;      // Type: "Diplôme", "Certification", "Attestation"
-    string ipfsHash;      // Hash IPFS du PDF
-    uint256 issuedAt;     // Date d'émission
-    bool revoked;         // Statut de révocation
+// Compteur global des certificats émis
+uint256 public certificateCounter;
+
+// Mapping : adresse organisation => données organisation
+mapping(address => Organization) public organizations;
+
+// Liste des adresses d'organisations (pour itération)
+address[] public organizationList;
+
+// Mapping : ID certificat => données certificat
+mapping(uint256 => Certificate) public certificates;
+
+// Mapping : adresse étudiant => array d'IDs de certificats
+mapping(address => uint256[]) public studentCertificates;
+
+// Mapping privé pour tracker les étudiants uniques par organisation
+mapping(address => mapping(address => bool)) private hasReceivedFromOrg;
+```
+
+### Structures de Données
+
+#### Organization
+```solidity
+struct Organization {
+    string name;             // Nom de l'organisation
+    string email;            // Email de contact
+    string orgType;          // "university" | "training" | "enterprise"
+    bool isActive;           // true = peut émettre, false = révoquée
+    uint256 registeredAt;    // Timestamp d'enregistrement
+    uint256 totalIssued;     // Nombre total de certificats émis
+    uint256 totalRevoked;    // Nombre de certificats révoqués
+    uint256 uniqueStudents;  // Nombre d'étudiants uniques
 }
 ```
 
-### Fonctions Principales
+#### Certificate
+```solidity
+struct Certificate {
+    uint256 id;              // Identifiant unique (auto-incrémenté)
+    address issuer;          // Adresse wallet de l'organisation émettrice
+    string issuerName;       // Nom de l'organisation (copié au moment de l'émission)
+    address student;         // Adresse wallet de l'étudiant
+    string studentName;      // Nom complet de l'étudiant
+    string studentEmail;     // Email de l'étudiant
+    string formationName;    // Nom de la formation/diplôme
+    string certType;         // "Diplôme" | "Certification" | "Attestation"
+    string ipfsHash;         // Hash IPFS du certificat (QmXXXX...)
+    uint256 issuedAt;        // Timestamp d'émission
+    bool revoked;            // Statut de révocation
+}
+```
 
-| Fonction | Accès | Description |
-|----------|-------|-------------|
-| `registerOrganization()` | Admin | Enregistre une nouvelle organisation |
-| `revokeOrganization()` | Admin | Révoque une organisation |
-| `issueCertificate()` | Org. autorisée | Émet un certificat |
-| `revokeCertificate()` | Org. émettrice | Révoque un certificat |
-| `getCertificate()` | Public | Récupère les détails d'un certificat |
-| `getStudentCertificates()` | Public | Liste les certificats d'un étudiant |
-| `getGlobalStats()` | Public | Statistiques globales |
+### Fonctions Administrateur
 
-### Événements
+#### registerOrganization
+```solidity
+function registerOrganization(
+    address orgAddress,
+    string memory name,
+    string memory email,
+    string memory orgType,
+    uint256 registeredAt
+) external onlyAdmin
+```
+**Description** : Enregistre une nouvelle organisation autorisée à émettre des certificats.
+
+**Vérifications** :
+- `orgAddress != address(0)` - Adresse valide
+- `bytes(name).length > 0` - Nom non vide
+- `!organizations[orgAddress].isActive` - Pas déjà enregistrée
+
+**Actions** :
+- Crée une nouvelle `Organization` struct
+- Ajoute à `organizationList`
+- Émet l'événement `OrganizationRegistered`
+
+#### revokeOrganization
+```solidity
+function revokeOrganization(address orgAddress) external onlyAdmin
+```
+**Description** : Révoque une organisation (elle ne peut plus émettre de nouveaux certificats).
+
+**Vérifications** :
+- `organizations[orgAddress].isActive` - Org existe et est active
+
+**Actions** :
+- Passe `isActive` à `false`
+- Émet l'événement `OrganizationRevoked`
+
+### Fonctions Organisation
+
+#### issueCertificate
+```solidity
+function issueCertificate(
+    address student,
+    string memory studentName,
+    string memory studentEmail,
+    string memory formationName,
+    string memory certType,
+    string memory ipfsHash,
+    uint256 issuedAt
+) external onlyAuthorizedOrg
+```
+**Description** : Émet un nouveau certificat pour un étudiant.
+
+**Vérifications** :
+- `onlyAuthorizedOrg` - Organisation active
+- `student != address(0)` - Adresse étudiant valide
+- `bytes(studentName).length > 0` - Nom non vide
+- `bytes(ipfsHash).length > 0` - Hash IPFS fourni
+
+**Actions** :
+1. Incrémente `certificateCounter`
+2. Met à jour les statistiques de l'organisation :
+   - `totalIssued++`
+   - Si nouvel étudiant : `uniqueStudents++`
+3. Crée le `Certificate` struct
+4. Ajoute l'ID à `studentCertificates[student]`
+5. Émet l'événement `CertificateIssued`
+
+#### revokeCertificate
+```solidity
+function revokeCertificate(uint256 certId) external onlyAuthorizedOrg
+```
+**Description** : Révoque un certificat précédemment émis.
+
+**Vérifications** :
+- `cert.issuer == msg.sender` - Seul l'émetteur peut révoquer
+- `!cert.revoked` - Pas déjà révoqué
+
+**Actions** :
+- Passe `revoked` à `true`
+- Incrémente `org.totalRevoked`
+- Émet l'événement `CertificateRevoked`
+
+### Fonctions de Lecture (View)
+
+#### getCertificate
+```solidity
+function getCertificate(uint256 certId) external view returns (Certificate memory)
+```
+Retourne les détails complets d'un certificat par son ID.
+
+#### getStudentCertificates
+```solidity
+function getStudentCertificates(address student) external view returns (Certificate[] memory)
+```
+Retourne tous les certificats d'un étudiant.
+
+#### getOrganizationCertificates
+```solidity
+function getOrganizationCertificates(address org) external view returns (Certificate[] memory)
+```
+Retourne tous les certificats émis par une organisation.
+
+#### getAllOrganizations
+```solidity
+function getAllOrganizations() external view returns (...)
+```
+Retourne la liste complète de toutes les organisations avec leurs statistiques.
+
+#### getGlobalStats
+```solidity
+function getGlobalStats() external view returns (
+    uint256 totalOrgs,
+    uint256 activeOrgs,
+    uint256 totalCerts,
+    uint256 revokedCerts
+)
+```
+Retourne les statistiques globales de la plateforme.
+
+## 🔔 Événements (Events)
 
 ```solidity
 event OrganizationRegistered(address indexed org, string name);
 event OrganizationRevoked(address indexed org);
-event CertificateIssued(uint256 indexed certId, address indexed issuer, address indexed student, string formation);
+event CertificateIssued(uint256 indexed certId, address indexed issuer, 
+                        address indexed student, string formation);
 event CertificateRevoked(uint256 indexed certId);
 ```
+
+**Utilité** :
+- Logging on-chain pour traçabilité complète
+- Indexation par Etherscan et explorateurs blockchain
+- Écoute d'événements côté frontend (notifications en temps réel)
+- Audit trail immuable
 
 ---
 
@@ -324,15 +510,6 @@ npm run dev
 
 Le projet sera accessible sur `http://localhost:5173`
 
-### Commandes Disponibles
-
-| Commande | Description |
-|----------|-------------|
-| `npm run dev` | Lancer le serveur de développement |
-| `npm run build` | Compiler pour la production |
-| `npm run preview` | Prévisualiser le build de production |
-| `npm run lint` | Vérifier le code avec ESLint |
-
 ---
 
 ## ⚙️ Configuration
@@ -363,12 +540,6 @@ VITE_APP_BASE_URL=http://localhost:5173
 VITE_IPFS_PUBLIC_GATEWAY=ipfs.io
 VITE_QR_API_URL=https://api.qrserver.com/v1/create-qr-code
 ```
-
-> [!IMPORTANT]
-> **Pour le déploiement en production (Vercel)**
-> - Configurez toutes les variables d'environnement dans les paramètres du projet
-> - Changez `VITE_APP_BASE_URL` vers votre URL de production
-> - Ne commitez JAMAIS le fichier `.env` (déjà dans `.gitignore`)
 
 ### Obtenir votre Token Pinata JWT
 
@@ -406,7 +577,7 @@ VITE_QR_API_URL=https://api.qrserver.com/v1/create-qr-code
 2. Accéder au tableau de bord Organisation
 3. **Émission individuelle** :
    - Remplir les informations de l'étudiant
-   - Générer le certificat PDF
+   - Générer le certificat
    - Confirmer la transaction
 4. **Émission en lot** :
    - Cliquer sur "Émission en Lot"
@@ -508,40 +679,6 @@ certiverse/
 - 🔐 **Stockage IPFS** : Certificats immuables et disponibles
 - 🔐 **QR Code intégré** : Vérification rapide et sécurisée
 
-### Bonnes Pratiques
-
-- Ne jamais partager sa clé privée
-- Vérifier l'adresse du contrat avant interaction
-- Utiliser un hardware wallet pour les comptes administrateurs
-
----
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! Voici comment participer :
-
-```bash
-# 1. Forker le projet
-
-# 2. Créer une branche pour votre fonctionnalité
-git checkout -b feature/NouvelleFeature
-
-# 3. Commiter vos changements
-git commit -m "Ajout de NouvelleFeature"
-
-# 4. Pousser sur la branche
-git push origin feature/NouvelleFeature
-
-# 5. Ouvrir une Pull Request
-```
-
-### Guidelines
-
-- Suivre les conventions de code existantes
-- Documenter les nouvelles fonctionnalités
-- Tester avant de soumettre
-- Écrire des messages de commit clairs
-
 ---
 
 ## 👨‍💻 Auteur
@@ -550,15 +687,7 @@ git push origin feature/NouvelleFeature
 
 ---
 
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
-
----
-
 <div align="center">
-
-**⭐ Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile !**
 
 Made with ❤️ and ⛓️ Blockchain Technology
 
