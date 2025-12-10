@@ -646,7 +646,7 @@ Pour que le frontend puisse interagir avec votre contrat, vous devez mettre à j
 
 ## 🎥 Démonstration
 
-[![Démonstration Vidéo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
+[![Démonstration Vidéo](https://img.youtube.com/vi/fuUdpkl_5dM/0.jpg)](https://youtu.be/fuUdpkl_5dM)
 
 > *Cliquez sur l'image pour voir la vidéo de démonstration du parcours complet.*
 
