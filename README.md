@@ -646,9 +646,14 @@ Pour que le frontend puisse interagir avec votre contrat, vous devez mettre à j
 
 ## 🎥 Démonstration
 
-[![Démonstration Vidéo](https://img.youtube.com/vi/fuUdpkl_5dM/0.jpg)](https://youtu.be/fuUdpkl_5dM)
+<div align="center">
+  <video width="100%" controls>
+    <source src="CertiVerse Demo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
 
-> *Cliquez sur l'image pour voir la vidéo de démonstration du parcours complet.*
+> *Vidéo de démonstration du parcours complet de CertiVerse.*
 
 ---
 
