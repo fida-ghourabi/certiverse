@@ -646,9 +646,20 @@ Pour que le frontend puisse interagir avec votre contrat, vous devez mettre à j
 
 ## 🎥 Démonstration
 
-[![Démonstration Vidéo](https://img.youtube.com/vi/fuUdpkl_5dM/0.jpg)](https://youtu.be/fuUdpkl_5dM)
+<div align="center">
 
-> *Cliquez sur l'image pour voir la vidéo de démonstration du parcours complet.*
+### 🎬 Vidéo Complète du Parcours
+
+<a href="https://youtu.be/ODQYPxO_nQc" target="_blank">
+  <img src="https://img.youtube.com/vi/ODQYPxO_nQc/maxresdefault.jpg" alt="Démonstration Vidéo CertiVerse" width="800" style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+</a>
+
+<br><br>
+
+[![▶️ Regarder la Démo Complète](https://img.shields.io/badge/▶️_Regarder_la_Démo_Complète-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ODQYPxO_nQc)
+[![🚀 Essayer l'Application](https://img.shields.io/badge/🚀_Essayer_l'Application-8B5CF6?style=for-the-badge&logo=ethereum&logoColor=white)](https://certiverse-six.vercel.app)
+
+</div>
 
 ---
 
