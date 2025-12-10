@@ -647,8 +647,8 @@ Pour que le frontend puisse interagir avec votre contrat, vous devez mettre à j
 ## 🎥 Démonstration
 
 <div align="center">
-  <video width="100%" controls>
-    <source src="CertiVerse Demo.mp4" type="video/mp4">
+  <video width="100%" controls aria-label="Vidéo de démonstration de CertiVerse" title="Démonstration complète de la plateforme CertiVerse">
+    <source src="CertiVerse-Demo.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 </div>
